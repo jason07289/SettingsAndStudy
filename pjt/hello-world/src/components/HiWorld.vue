@@ -4,7 +4,8 @@
     <h1>{{ msg }}</h1>
     <h1 v-bind:title="msg">title에 있지롱</h1>
     <h1 v-if="seen">seen을 true하면 보이죠</h1>
-    <ol>     
+    <ol>
+      <!-- <li v-bind:key="todo" v-for="todo in todoArray"> -->
       <li v-for="(todo, i) in todoArray" :key="i">
         {{ todo.text }}
       </li>
