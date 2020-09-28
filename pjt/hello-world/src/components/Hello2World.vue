@@ -1,26 +1,21 @@
 <template>
-  <div class="hello">
+  <div class="hello2">
+    <hr>
     <h1>{{ msg }}</h1>
-      <Hello2World/>
   </div>
 </template>
 
 <script>
-import Hello2World from './Hello2World'
 export default {
-  name: 'HelloWorld',
+  name: 'Hello2World',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: '(추가) 저는 Hello2World 컴포넌트 입니다.'
     }
-  },
-  components: {
-    Hello2World
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
