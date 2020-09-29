@@ -61,10 +61,22 @@ SELECT	name, location
 FROM	book_store
 WHERE	category = 'java'
 ```
+<br>
+<br>
+
+## 인덱스를 사용할 경우
+- Primary Key, Foreign key 그리고 join을 할 경우에 쓰이는 column
+- where절, order by에서 자주 사용
+
+<br> 
+
 ## 주의점
 - 인덱스는 다른 테이블에 의존적인 새로운 테이블이 하나 생성된다.
 - 인덱스는 기본적으로 "이진트리 검색"을 사용하기에 기본적으로 정렬된 상태, 즉 삽입, 삭제, 수정이 일어날 때는 데이터 정렬과정이 일어나기에 전체적인 성능 저하를 초래할 수 있다.
-- 마지막으로 인덱스는 검색(배민, 쇼핑몰 등)에 최적화된 기능이기에 삽입, 삭제, 수정이 자주 일어나는 비즈니스로적(페이스북 등)에서는 인덱스 사용 여부를 신중하게 고민해야한다.  
+- 마지막으로 인덱스는 검색(배민, 쇼핑몰 등)에 최적화된 기능이기에 삽입, 삭제, 수정이 자주 일어나는 비즈니스로적(페이스북 등)에서는 인덱스 사용 여부를 신중하게 고민해야한다. 
+- 한번 더 생각해 보면 수정, 삭제 행위 자체는 느리지만 이 행위를 위해 데이터를 조회할 필요가 있기에 인덱스가 있으면 더 빠르게 진행할 수 있다.
+- 같은 값이 많이 저장되는 컬럼과 반환결과가 전체 데이터 건수에 비해 많을 때에는 주의한다.
+- SQL server1, SQL server2가 있을 때, insert 성능과 select 성능에 맞게 구성을 다르게 할 수 있다.
 <br>
 <br>
 <br>  
@@ -74,4 +86,104 @@ WHERE	category = 'java'
 <br>
 <br>
 <br>
-# Index 사용법
+# Index 사용예시
+<br>  
+
+## Index 생성
+
+```sql
+--문법
+CREATE INDEX [인덱스명] ON [테이블명](col1, col2, col3 ...);
+```
+```sql
+--예제
+CREATE INDEX EX_INDEX ON CUSTOMERS(NAME,ADDRESS); 
+
+--예제 컬럼 중복 X
+CREATE[UNIQUE] INDEX EX_INDEX ON CUSTOMERS(NAME,ADDRESS);
+
+```
+### Index 생성 예제 기본
+- 단일 컬럼의 경우  
+    해당 쿼리를 자주 사용한다면?
+    ```sql
+    select * from ORDER_INFO where ORDER_DATE between '20181201' and '20181231' 
+    ```
+    ORDER_DATE 한 개의 컬럼을 인덱스로 잡아준다.
+    ```sql
+    CREATE INDEX ORDER_DATE_ORDER_INFO ON ORDER_INFO
+    (
+       ORDER_DATE ASC
+    )
+    ```  
+
+- 복합 컬럼의 경우  
+    해당 쿼리를 자주 사용한다면?
+    ```sql
+    select * from ORDER_INFO where ORDER_DATE PRODUCT = '컴퓨터' and ORDER_DATE between '20181201' and '20181231'  
+    ```
+    위와 같이 PRODUCT 와 ORDER_DATE 가 AND로 연결되어 자주 사용 된다면 두가지를 사용할 수 있다.
+    ```sql
+    CREATE INDEX PRODUCT_ORDER_DATE_ORDER_INFO ON ORDER_INFO
+    (
+    PRODUCT ASC, ORDER_DATE ASC
+    )
+    ```
+    <br>
+## Index 조회
+```sql
+SELECT * FROM USER_INDEXES WHERE TABLE_NAME = 'CUSTOMERS';
+```
+## Index 삭제
+```sql
+--문법
+DROP INDEX [인덱스 명];
+
+--예제
+DROP INDEX EX_INDEX;
+```
+<br> 
+
+## 기존 테이블에 Index 추가하기
+```sql
+-- 문법
+ALTER TABLE  테이블명 ADD INDEX(필드명(크기));
+
+--예제
+ALTER TABLE temp ADD INDEX(keyword(20));
+
+```
+
+
+
+# Index 리빌드(Rebuild)사용 예시
+<br> 
+
+## 인덱스 리빌드 이유 
+- 인덱스 파일은 생성 후 insert, update, delete 등을 반복하면 성능이 저하된다.
+- 해당 작업이 오래 지속될 시 트리의 한쪽이 무거워져 전체적으로 트리의 깊이가 길어 지기에 주기적으로 리빌딩 작업이 필요하다.
+
+## Index 트리의 깊이가 4이상인 index를 조회
+```sql
+--문법
+SELECT I.TABLESPACE_NAME,I.TABLE_NAME,I.INDEX_NAME, I.BLEVEL,
+       DECODE(SIGN(NVL(I.BLEVEL,99)-3),1,DECODE(NVL(I.BLEVEL,99),99,'?','Rebuild'),'Check') CNF
+FROM   USER_INDEXES I
+WHERE   I.BLEVEL > 4
+ORDER BY I.BLEVEL DESC
+```
+
+## Index 리빌드
+```sql
+--문법
+ALTER INDEX [인덱스명] REBUILD;
+
+--예제
+ALTER INDEX EX_INDEX REBUILD;
+```
+- 조회와 리빌드 쿼리를 합쳐서 간편하게 한번에 실행도 가능하다.
+
+## 전체 Index 리빌드
+```sql
+SELECT 'ALTER INDEX '||INDEX_NAME||' REBUILD; 'FROM USER_INDEXES;
+```

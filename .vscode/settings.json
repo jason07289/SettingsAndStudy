@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.shell.windows": "",
+    "powermode.enabled": true,
+    "powermode.enableShake": false,
+    "powermode.presets":"particles"
+}
