@@ -25,7 +25,7 @@ WHERE	title = 'Transaction';
 ## [book_store]  Table
 ![image](https://user-images.githubusercontent.com/38865267/94499770-7f2cd200-0238-11eb-9983-3474d8f70940.png)  
 <br>  
-```sql
+```sql 
 SELECT	name, location
 FROM	book_store
 WHERE	category = 'java'
