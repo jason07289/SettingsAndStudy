@@ -38,3 +38,12 @@
 - 바인드 변수가 불필요한 경우
   - 수행빈도가 아주 낮을 때
   - 조건절 컬럼의 값 종류가 적을 때 (ex. 남/여, 1~12월 등)
+
+- JAVA와 같이 사용
+```java
+    String query = "SELECT * FROM exmaple_table WHERE id = ?";
+    PreparedStatement ps = con.prepareStatement(query);
+    ps.setint(1,id);
+```
+- 물론 ?를 :id와 같은 형태로도 사용 가능.
+
